@@ -27,7 +27,7 @@ Enter the password when prompted. Type yes if you are prompted to accept a key.
 
 Open a PuTTY session, enter the name of the host: **randi.cri.uchicago.edu,** in the Host Name box, and select SSH as the Connection Type, verify the port number set in Port Box is 22.  Press the Open button at the bottom, then type in your username and password when prompted (note: type yes if you are prompted to accept a key before entering username).
 
-![putty.jpg](https://biocore.cri.uchicago.edu/images/putty.jpg)
+![](https://biocore.cri.uchicago.edu/images/putty.jpg)
 
 ## Navigation
 
