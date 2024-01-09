@@ -17,7 +17,9 @@ The login procedure varies slightly depending on whether you use a Windows compu
 1. Open a terminal session
 2. Connect to the login node of randi cluster:
 
-`ssh username@randi.cri.uchicago.edu`
+```bash
+ssh username@randi.cri.uchicago.edu  ## Change username to your own username
+```
 
 Enter the password when prompted. Type yes if you are prompted to accept a key.
 
