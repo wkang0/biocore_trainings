@@ -136,8 +136,8 @@ Open a PuTTY session, enter the name of the host: **randi.cri.uchicago.edu,** in
 7. Compress files
 
     ```bash
-
-    cd ~/folder2/Linux
+    cp -r /gpfs/data/cri-training/linux ~/folder2  ### copy workshop training material to folder2
+    cd ~/folder2/linux
 
     ls -l SRR*                     ### * is a wildcard to match any strings
 
@@ -151,11 +151,15 @@ Open a PuTTY session, enter the name of the host: **randi.cri.uchicago.edu,** in
 1. From PC: use WinSCP ([http://winscp.net/eng/index.php](http://winscp.net/eng/index.php))
 2. From MAC: use scp in terminal
 
-    `scp example1.txt username@randi.cri.uchicago.edu:.`
+    ```bash
+    scp example1.txt username@randi.cri.uchicago.edu:.
+    ```
 
 3. You can use wget to get a file from a website directly on your Linux.
 
-    `wget http://downloads.yeastgenome.org/curation/chromosomal_feature/saccharomyces_cerevisiae.gff`
+    ```bash
+    wget https://ftp.ensembl.org/pub/release-110/gtf/saccharomyces_cerevisiae/Saccharomyces_cerevisiae.R64-1-1.110.gtf.gz
+    ```
 
 ## I/O redirection and pipe
 
@@ -221,7 +225,7 @@ These streams can be piped and redirected to files or other processes. This cons
 
     ```bash
     > cat list1.txt                      ### See what's in the list1.txt
-
+    
     apples
     bananas
     plums
@@ -305,8 +309,7 @@ These streams can be piped and redirected to files or other processes. This cons
     11   rs10873487  767334548  G   964  3811  A   0.5525   0.2356  0.2391
 
     > sort -k1n table.txt  > table_sorted1.txt         ### sort the table by the first column in numerical order
-
-    ### and write the results to a new file
+                                                       ### and write the results to a new file
     > cat table_sorted1.txt
     CHR	SNP	BP	A1	C_A	C_U	A2	CHISQ	P	OR
     1	rs10873883	76734548	G	934	3811	A	0.5325	0.4656	0.9691
@@ -333,7 +336,7 @@ These streams can be piped and redirected to files or other processes. This cons
     1	rs10873883	76734548	G	934	3811	A	0.5325	0.4656	0.9691
     1	rs11589256	214196749	C	271	1084	T	0.01928	0.8896	0.9902
 
-    > cut -f1,2,3,5 table.txt                ####Extract columns 1, 2, 3, and 5 from table.txt
+    > cut -f1,2,3,5 table.txt       ####Extract columns 1, 2, 3, and 5 from table.txt
     CHR	SNP	BP	C_A
     19	rs10401969	19268718	222
     1	rs10873883	76734548	934
@@ -451,76 +454,115 @@ So, we have seen an introduction to Linux, now how is this relevant to bioinform
 2. Working with FASTQ on the command line\*  
     Let's view the file using **less**: `<space>` or f to the Next Page; b to the Previous Page; q to Exit;
 
-    `less SRR001655.fastq`
+    ```bash 
+    less SRR001655.fastq
+    ```
 
     How many reads are in file SRR001655.fastq? (Hint: use cat, grep and wc)
 
-    `cat SRR001655.fastq | grep ^@SRR | wc -l`
+    ```bash
+    cat SRR001655.fastq | grep ^@SRR | wc -l
+    ```
 
     or
 
-    `grep ^@SRR SRR001655.fastq | wc -l`
+    ```bash
+    grep ^@SRR SRR001655.fastq | wc -l
+    ```
 
     Show me the first 25 reads in file SRR001655.fastq? (Hint: use head)
 
-    `head -n 100 SRR001655.fastq`
+    ```bash
+    head -n 100 SRR001655.fastq
+    ```
 
     or
 
-    `head -100 SRR001655.fastq`
+    ```bash
+    head -100 SRR001655.fastq
+    ```
 
     Show me all the sequences that contains GAGAGAGC in file SRR001655.fastq? (Hint: use grep)
 
-    `grep GAGAGAGC SRR001655.fastq`
+    ```bash
+    grep GAGAGAGC SRR001655.fastq
+    ```
 
     Write the last 10000 reads to a new file bottom\_10000.fastq? (Hint: use tail)
 
-    `tail -40000 SRR001655.fastq > bottom_10000.fastq`
+    ```bash
+    tail -40000 SRR001655.fastq > bottom_10000.fastq
+    ```
 
 3. Using paste to get your data into a format you may prefer  
     FASTQ format is the format of data that all bioinformatics tools prefer and understand, however, sometimes it is preferable to look at data as a table i.e. in columns.  We can do this with the **paste** command. The **paste** command writes lines in one file out as columns, separated by a tab character. The command can take "-" as an option, which means read from stdin. So if we give it the option "- - - -", this means "read four lines, and write it them out as four columns). Let's take a look:
+    ```bash
+    cat bottom_10000.fastq | paste - - - - | head -10`
 
-    `cat bottom_10000.fastq | paste - - - - | head -10`
+    cat bottom_10000.fastq | paste - - - - | head -1000 > top_1000_tab.txt  
+    ```
 
-    `cat bottom_10000.fastq | paste - - - - | head -1000 > top_1000_tab.txt`
 
 ### Using awk and working with data in columns  
 
 Now that we have some data in tabular format, we can look at using **awk**.
 
-`awk '/search pattern/{Actions}' filename`
+```bash 
+awk '/search pattern/{Actions}' filename
+```
 
 Briefly, awk goes through each line in _filename_ and if the line matches the search pattern, the action is performed. Let's see some examples:
 
-`awk '/N/{print}' top_1000_tab.txt`
+```bash
+awk '/N/{print}' top_1000_tab.txt
+```
 
 This simply prints out all lines in the file that contain an N - could be useful, but we can do that with **grep** anyway.  What happens when you execute:
 
-`awk '/N/{print $1,"\t",$2,"\t",$3,"\t",$4}' top_1000_tab.txt`
+```bash
+awk '/N/{print $1,"\t",$2,"\t",$3,"\t",$4}' top_1000_tab.txt
+```
 
 What do you think the $1, $2 etc mean? How about the "\\t"? Instead, try this:
 
-`awk '/N/{print $1,"\t",$3}' top_1000_tab.txt`
+```bash
+awk '/N/{print $1,"\t",$3}' top_1000_tab.txt
+```
 
 We can use these in the match operation e.g.
 
-`awk '$3 ~ /N/{print $1,"\t",$3}' top_1000_tab.txt`
+```bash
+awk '$3 ~ /N/{print $1,"\t",$3}' top_1000_tab.txt
+```
 
 Up until now, we were asking the question "Does any part of the line contain an N?".  In this last case, we are asking the question: for each line, does the data in column 3 contain an N? Note column 3 is the sequence, and so you may be interested in which lines have sequences that contain N's:
 
-`awk '$3 ~ /N/{print $1}' top_1000_tab.txt`
+```bash
+awk '$3 ~ /N/{print $1}' top_1000_tab.txt
+```
 
 Identifies which reads contains N's.
 
-`awk '$3 ~ /N/ {print $1}' top_1000_tab.txt | wc -l`
+```bash
+awk '$3 ~ /N/ {print $1}' top_1000_tab.txt | wc -l
+```
 
 Counts the number of reads that contain N's.  Note we can also do this by piping data into awk e.g.
 
-`cat top_1000_tab.txt | awk '$3 ~ /N/{print $1}' | wc -l`
+```bash
+cat top_1000_tab.txt | awk '$3 ~ /N/{print $1}' | wc -l
+```
 
-1. Putting it together into something useful  
-    How about a quick fastq to fasta converter?
+Putting it together into something useful  
+How about a quick fastq to fasta converter?
 
-    `cat SRR001655.fastq | paste - - - - | awk '{print ">"$1,$2,"\n"$3}'`
+```bash
+cat SRR001655.fastq | paste - - - - | awk '{print ">"$1,$2,"\n"$3}'
+```
 
-    This is very crude, but in brief: we print the file to the stream, which we pipe into paste to convert to tabular data. We pipe this into awk. As we don't use a search pattern, awk accepts every line. First we print out the ">", and then columns 1 and 2 to make up the identifier. We then print out a new line ("\\n") and then finally the third column which is the sequence.
+This is very crude, but in brief: we print the file to the stream, which we pipe into paste to convert to tabular data. We pipe this into awk. As we don't use a search pattern, awk accepts every line. First we print out the ">", and then columns 1 and 2 to make up the identifier. We then print out a new line ("\\n") and then finally the third column which is the sequence.
+
+## Feedback:
+
+
+Please provide feedback to us [https://biocore.cri.uchicago.edu/cgi-bin/survey.cgi?id=72](https://biocore.cri.uchicago.edu/cgi-bin/survey.cgi?id=72). 
